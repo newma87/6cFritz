@@ -1,10 +1,5 @@
-//#include <SoftwareSerial.h>
-
 #include "SoftwareServos.h"
 #include <EEPROM.h>
-
-#define mySerial Serial
-//SoftwareSerial mySerial(10, 11);
 
 int highestPin = 20;
 
@@ -51,8 +46,8 @@ void initialize()
 
 void setup()
 {
-  mySerial.begin(57600);
- //Serial.begin(9600);
+  Serial.begin(57600);
+
   ss_Init();
 }
 
@@ -73,41 +68,41 @@ int readPacket()
 
   do
   {
-    while (mySerial.available() <= 0) continue;
-    g_command = mySerial.read();
+    while (Serial.available() <= 0) continue;
+    g_command = Serial.read();
   }
   while ((g_command&128)==0);
- //Serial.println(g_command);
+
   g_message[0] = crc = g_command;
   g_command^=128;
 
-  while (mySerial.available() <= 0) continue;
-  g_length = g_message[1] = mySerial.read();
+  while (Serial.available() <= 0) continue;
+  g_length = g_message[1] = Serial.read();
   crc ^= g_length;
 
   if (g_command>=32)
   {
-    while (mySerial.available() <= 0) continue;
-    g_message[2] = high = mySerial.read();
+    while (Serial.available() <= 0) continue;
+    g_message[2] = high = Serial.read();
     g_length = g_length|(high<<7);
     crc ^= high;
     g_messageTop=3;
   }
- //Serial.println(g_length);
+
   // read in entire message
   if (g_length>0)
   {
     int count = g_length;
     while (count>0)
     {
-      while (mySerial.available() <= 0) continue;
-      g_message[g_messageTop] = mySerial.read();
+      while (Serial.available() <= 0) continue;
+      g_message[g_messageTop] = Serial.read();
       crc ^= g_message[g_messageTop++];
       count--;
     }
 
-    while (mySerial.available() <= 0) continue;
-    g_message[g_messageTop++] = g_crc = mySerial.read();
+    while (Serial.available() <= 0) continue;
+    g_message[g_messageTop++] = g_crc = Serial.read();
 
     if ((crc&127)!=(g_crc&127)) return 0;
   }
@@ -116,7 +111,7 @@ int readPacket()
 
 void echoPacket()
 {
-  mySerial.write(g_message, g_messageTop);
+  Serial.write(g_message, g_messageTop);
 }
 
 // sets a part in the face identified by an id instead of a pin. This 
@@ -164,16 +159,16 @@ void executeSavedSequence()
   
   startSeq+=2;
   int stopSeq = startSeq + len;
-  while ((startSeq<stopSeq)&&(!mySerial.available()))
+  while ((startSeq<stopSeq)&&(!Serial.available()))
   {
     int object = EEPROM.read(startSeq++);
     int pos = EEPROM.read(startSeq++);
     pos |= EEPROM.read(startSeq++)<<8;
 /*
-mySerial.println(delayFor);      
-mySerial.println(object);      
-mySerial.println(pos);      
-mySerial.println("");      
+Serial.println(delayFor);      
+Serial.println(object);      
+Serial.println(pos);      
+Serial.println("");      
 */  
     if (object==255)
     {
@@ -200,7 +195,7 @@ void loop()
   digitalWrite(19, HIGH);
   delayMicroseconds(10); // Added this line
   digitalWrite(19, LOW);
-  mySerial.println(pulseIn(18, HIGH));
+  Serial.println(pulseIn(18, HIGH));
   return;
 */
   
@@ -229,7 +224,7 @@ void loop()
   {
     while (millis()<5000)
     {
-      if (mySerial.available())
+      if (Serial.available())
       {
         g_autoRun = 1;
         break;
@@ -238,7 +233,7 @@ void loop()
     
     if (g_autoRun==0)
     {
-      while (!mySerial.available())
+      while (!Serial.available())
       {
         initialize();
         executeSavedSequence();
@@ -253,7 +248,7 @@ void loop()
   int i,j;
   int trimVal, maxVal, minVal, pin;
 
-  while (mySerial.available()>0)
+  while (Serial.available()>0)
   {
     if (readPacket()==0) 
       return;
@@ -263,7 +258,7 @@ void loop()
       // init
       case  ARDUINO_GET_ID:
         initialize();
-        mySerial.print("ARDU004");
+        Serial.print("ARDU004");
       break;
       // servo
       case  ARDUINO_RELEASE_SERVO:
@@ -299,27 +294,19 @@ void loop()
         g_count = g_message[3]*2;
 
         g_message[0]=g_command|128;
-        if (g_count > 128) {
-          g_message[1] = (g_count + 1) & 127;
-          g_message[2] = ((g_count + 1) >> 7) & 127;  
-        } else {
-          g_message[1]=g_count+1;
-          g_message[2]=0;
-        }
-       //Serial.println(g_count + 1);
+        g_message[1]=g_count+1;
+        g_message[2]=0;
+
         crc=g_message[0]^g_message[1]^g_message[2];
 
 	for (j=3,i=0;i<g_count;i+=2,j+=2)
 	{
 	  g_message[j] = g_config[i];
 	  g_message[j+1] = g_config[i+1];
-  //Serial.print(g_config[i]);
-  //Serial.print(" ");
-  //Serial.println(g_config[i + 1]);
 	  crc=crc^g_message[j]^g_message[j+1];
 	}
 	g_message[j]=crc&127;
- //Serial.print("load config response:");
+
 	for (i=3;i<j;i+=10)
         {
            trimVal = g_message[i] | (g_message[i+1]<<7);
@@ -342,9 +329,8 @@ void loop()
           }
         }
 
-	mySerial.write(g_message, j+1);
+	Serial.write(g_message, j+1);
 
- //Serial.println(j + 1);
       break;
       case ARDUINO_SAVE_CONFIG:
 
@@ -359,7 +345,7 @@ void loop()
         g_message[0]=g_command|128;
         g_message[1]=0;
         g_message[2]=0;
-	mySerial.write(g_message, 3);
+	Serial.write(g_message, 3);
       break;
       case ARDUINO_RESET:
 
@@ -423,7 +409,7 @@ void loop()
         g_message[0]=g_command|128;
         g_message[1]=0;
         g_message[2]=0;
-	mySerial.write(g_message, 3);
+	Serial.write(g_message, 3);
       break;
     }
   }
