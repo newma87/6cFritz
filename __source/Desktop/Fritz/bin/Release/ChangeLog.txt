@@ -1,0 +1,42 @@
+************ Version 1.5 Date 3/10/2013 ************
+
+
+
+************ Version 1.4 Date 3/10/2013 ************
+
+* expanded expression list on first load up
+
+* ensured load and save work for movements
+
+* ensured cut and paste work for movements
+
+* added icons and keyboard shortcuts for menu items
+
+* added Cut Movement into main menu, removes movement without cutting audio
+
+************ Version 1.3 Date 3/10/2013 ************
+
+* Added version to main title
+
+* Changed Menu Option "Servo Calibration" to "Servo Setup" (less technical sounding)
+
+* Added note/label to the config/setup window that says "Left is YOUR left as you face Fritz"
+
+* Removed Speed setting since Fast was sufficient and Slow is too slow to see.
+
+* Added large banner now ontop of main interface to tell if connected to the robot or not
+
+* Fixed trim on joystick, keyboard and simulation usage
+
+* Disabled arrow keys when drop down boxes are in focus on Keyboard configuration otherwise testing the keys would change the selected option. 
+
+* Changed wording "cursor" to "arrow"
+
+* Ensured that on connection with PC Fritz will assume 0.5 position on all servos according to calibrated data.
+
+* Fixed spelling ackward should be awkward
+
+* Fixed "yanking out joystick" crash
+
+
+

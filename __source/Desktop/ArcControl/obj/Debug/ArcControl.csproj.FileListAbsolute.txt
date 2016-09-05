@@ -1,0 +1,77 @@
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ResolveAssemblyReference.cache
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\Arc.baml
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\Arc.g.cs
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ArcControl.g.resources
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\GenerateResource.read.1.tlog
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\GenerateResource.write.1.tlog
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\www\Fritz\Desktop\Fritz\ArcControl\bin\Debug\ArcControl.dll.config
+C:\www\Fritz\Desktop\Fritz\ArcControl\bin\Debug\ArcControl.dll
+C:\www\Fritz\Desktop\Fritz\ArcControl\bin\Debug\ArcControl.pdb
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ArcControl.dll
+C:\www\Fritz\Desktop\Fritz\ArcControl\obj\Debug\ArcControl.pdb
+C:\www\Fritz\Code\Desktop\ArcControl\bin\Debug\ArcControl.dll.config
+C:\www\Fritz\Code\Desktop\ArcControl\bin\Debug\ArcControl.dll
+C:\www\Fritz\Code\Desktop\ArcControl\bin\Debug\ArcControl.pdb
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ResolveAssemblyReference.cache
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\Arc.baml
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\Arc.g.cs
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ArcControl.g.resources
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\GenerateResource.read.1.tlog
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\GenerateResource.write.1.tlog
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ArcControl.dll
+C:\www\Fritz\Code\Desktop\ArcControl\obj\Debug\ArcControl.pdb
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll.config
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.pdb
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ResolveAssemblyReference.cache
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\Arc.baml
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\Arc.g.cs
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.g.resources
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.read.1.tlog
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.write.1.tlog
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.dll
+C:\www\Fritz\Code\Fritz\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.pdb
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll.config
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.pdb
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ResolveAssemblyReference.cache
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\Arc.baml
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\Arc.g.cs
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.g.resources
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.read.1.tlog
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.write.1.tlog
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.dll
+C:\www\Fritz\Open Source\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.pdb
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll.config
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.pdb
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ResolveAssemblyReference.cache
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\Arc.baml
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\Arc.g.cs
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.g.resources
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.read.1.tlog
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\GenerateResource.write.1.tlog
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.dll
+C:\www\Fritz\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.pdb
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll.config
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.dll
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\bin\Debug\ArcControl.pdb
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.csprojResolveAssemblyReference.cache
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\Arc.baml
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\Arc.g.cs
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl_MarkupCompile.cache
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.g.resources
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.Properties.Resources.resources
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.csproj.GenerateResource.Cache
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.dll
+C:\Users\newma\Downloads\Open_Source_Files\Source Code\Desktop\ArcControl\obj\Debug\ArcControl.pdb
