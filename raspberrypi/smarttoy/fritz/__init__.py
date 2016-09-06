@@ -9,16 +9,19 @@ __all__ = ["protocol"]
 
 __author__ = "newma<newma@live.cn>"
 
+__WAIT_FOR_RESET__ = True
+
 from protocol import Protocol
 from serial import Serial
 import serial.tools.list_ports
 from time import sleep
+import time
 
 
 class FritzRobot(object):
 
 	__SAVE_ORDER__ = ('leftEyebrow', 'rightEyebrow', 'leftLidPosition', 'rightLidPosition', 'leftHorizontalEye', 'rightHorizontalEye', 'leftVerticalEye', 
-	'rightVerticalEye', 'neckTwist', 'neckTilt', 'leftLip', 'rightLip', 'jaw', 'sonar', 'ir')
+	'rightVerticalEye', 'neckTwist', 'neckTilt', 'leftLip', 'rightLip', 'jaw', None, None, 'sonar', 'ir')
 
 	def __init__(self):
 		self.state = { 
@@ -51,7 +54,7 @@ class FritzRobot(object):
 
 	def saveConfig(self):
 		if not self.isConnected():
-			print "Device is disconnection, please use findBoard to connect to device on serial port"
+			print "[error]Device is disconnection, please use findBoard to connect to device on serial port"
 			return False
 
 		shortArray = self.__serialConfig()
@@ -62,31 +65,32 @@ class FritzRobot(object):
 			byteArray = self.serial.read(3)
 			command, _ = self.protocol.unpackResponseHead(byteArray)
 			if command != Protocol.ARDUINO_SAVE_CONFIG :
-				print "print save config response is not correct"
+				print "[warn]Print save config response is not correct"
 			return True
-		except Exception as e:
+		except IOError as e:
 			print "saveConfig raise Exception:" + str(e)
 		return False
 
 	def loadConfig(self):
 		if not self.isConnected():
-			print "Device is disconnection, please use findBoard to connect to device on serial port"
+			print "[error]Device is disconnection, please use findBoard to connect to device on serial port"
 			return False
 
 		try:
 			byte2Read = self.serial.inWaiting()
 			if byte2Read > 0:
-				print "clear up pre dirty serial data"
-				self.serial.read(byte2Read)
+				self.serial.read(byte2Read) # read when there some dirty data stay in the serial port input buffer
 			self.serial.write(self.protocol.packCommand(Protocol.ARDUINO_LOAD_CONFIG, [85]))
 			self.serial.flush()
-			#read config
-			sleep(0.5)		# wait for serial prepare
-			byteArray = self.serial.read(3)
+
+			head_byte_count = 3
+			if not self.__waitFortSerialPortData(head_byte_count, timeoutSeconds = 5) : # wait util data prepare
+				print '[error]Load config response read head data{count:%d} time out' % head_byte_count
+				return False
+			byteArray = self.serial.read(head_byte_count)
 			command, count = self.protocol.unpackResponseHead(byteArray)
-			print command, count
 			if command != Protocol.ARDUINO_LOAD_CONFIG:
-				print 'load config return an error command'
+				print '[error]Load config return an error command'
 				byte2Read = self.serial.inWaiting()
 				self.serial.read()
 				return False
@@ -94,24 +98,23 @@ class FritzRobot(object):
 			byteArray = self.__readSerial(count)
 			#self.__dumpRobotState()
 			self.__unserialConfig(self.protocol.unpackByteArray2ShortArray(byteArray))
-			print "after load config...................."
-			#self.__dumpRobotState()
+			self.__dumpRobotState()
 			return True
-		except Exception as e:
-			print "LoadConfig raise Exception:" + str(e)
+		except IOError as e:
+			print "[error]LoadConfig raise Exception:" + str(e)
 		return False
 
 	def reset(self):
 		if not self.isConnected():
-			print "Device is disconnection, please use findBoard to connect to device on serial port"
+			print "[error]Device is disconnection, please use findBoard to connect to device on serial port"
 			return False
 
 		try:
 			self.serial.write(self.protocol.packCommand(Protocol.ARDUINO_RESET))
 			self.serial.flush()
 			return True
-		except Exception as e:
-			print "reset raise Exception:" + str(e)
+		except IOError as e:
+			print "[error]reset raise Exception:" + str(e)
 		return False
 
 	def findBoard(self):
@@ -120,32 +123,39 @@ class FritzRobot(object):
 			s = None
 			try:
 				s = Serial(port = p.device, baudrate = 57600, timeout = 5, write_timeout = 1)
-				#print "waiting read"
+				if __WAIT_FOR_RESET__ == True:
+					print "[info]Waitting for arduino reset ..."
+					sleep(3)  # wait for arduino reset when serial port has been opened
 				byte2Read = s.inWaiting()
 				if byte2Read > 0:
-					print "clear input buffer when we need to response"
-					s.read(byte2Read)
-				print "checking port %s ..." % p.device
+					s.read(byte2Read)  # read when there some dirty data stay in the serial port input buffer
+				print "[info]Checking port %s ..." % p.device
 				s.write(self.protocol.packCommand(Protocol.ARDUINO_GET_ID))
 				s.flush()
-				sleep(0.5)
 				buf = s.read(size = 7)
 				if (buf != None) and (len(buf) == 7):
 					pre, version = self.protocol.unpackVersion(buf)
 					if pre == 'ARDU':
 						if version < 4:
-							print "The fritz firmwork is too old, we need at least version 4 and above"
+							print "[warn]The fritz firmwork is too old, we need at least version 4 and above"
 						self.serial = s
 						return p.device
 
 				s.close()
-			except Exception as e:
-				print "findBoard raise Exception:" + str(e)
+			except IOError as e:
+				print "[error]FindBoard raise Exception:" + str(e)
 				if s != None and s.isOpen() :
 					s.close()
 				continue
 
 		return None
+
+	def __waitFortSerialPortData(self, dataCount, timeoutSeconds):
+		start_second = time.clock()
+		while self.serial.inWaiting() < dataCount:
+			if (time.clock() - start_second) > timeoutSeconds:
+				return False
+		return True
 
 	def __readSerial(self, byteLen):
 		byteArray = []
@@ -172,6 +182,8 @@ class FritzRobot(object):
 		shortArray = [0] * 85
 		i = 0
 		for item in FritzRobot.__SAVE_ORDER__:
+			if item == None:
+				continue
 			conf = self.state[item]
 			if item == "sonar":
 				shortArray[77] = conf['triggerPin']
@@ -200,14 +212,18 @@ class FritzRobot(object):
 		return shortArray
 
 	def __unserialConfig(self, shortArray):
-		#print shortArray
-		i = 0
-		while (i < len(shortArray)):
-			print shortArray[i], shortArray[i + 1], shortArray[i + 2], shortArray[i + 3], shortArray[i + 4]
-			i += 5
-		
+		#check if the serialize config data is invalidate
+		validate = False
+		for k in range(0, len(FritzRobot.__SAVE_ORDER__)):
+			if not shortArray[k * 5] == shortArray[k * 5 + 1] == shortArray[k * 5 + 2] == shortArray[k * 5 + 3] == shortArray[k * 5 + 0] == 0x3fff:
+				validate = True
+		if not validate:
+			print '[warn]Config come from arduino is not invalidate, will use default config'
+			return
 		i = 0
 		for item in FritzRobot.__SAVE_ORDER__:
+			if item == None:
+				continue
 			conf = self.state[item]
 			if item == "sonar":
 				conf['triggerPin'] = shortArray[77]
@@ -226,27 +242,35 @@ class FritzRobot(object):
 			i += 1
 
 	def __dumpRobotState(self):
-		print self.state
+		for item in self.__SAVE_ORDER__:
+			if item == None:
+				continue
+			props = self.state[item]
+			if item == "ir":
+				print "\"%s\" : { \"%s\":%d, \"%s\":%d }" % (item, 'pin', props['pin'], 'enable', props['enable'])
+			else:
+				if item == "sonar":
+					print "\"%s\" : { \"%s\":%d, \"%s\":%d, \"%s\":%d }" % (item, 'triggerPin', props['triggerPin'], 'echoPin', props['echoPin'], 'enable', props['enable'])
+				else:
+					print "\"%s\" : { \"%s\":%d, \"%s\":%d, \"%s\":%d, \"%s\":%d, \"%s\":%d }" % (item, 'trim', props['trim'], 'max', props['max'], 'min', props['min'], 'pin', props['pin'], 'enable', props['enable'])
 
 	def __pinDigitalWrite(self, pin, value):
 		if not self.isConnected():
-			print "Device is disconnection, please use findBoard to connect to device on serial port"
+			print "[error]Device is disconnection, please use findBoard to connect to device on serial port"
 			return False
 
 		buf = self.protocol.packShortPinValue(Protocol.ARDUINO_SET_SERVO, pin, value + 1500)
 		try:
-			print "write servo pin {%d} = value {%d}" % (pin, value)
-			print buf
 			self.serial.write(buf)
 			self.serial.flush()
-		except Exception as e:
-			print "__pinDigitalWrite raise Exception:" + str(e)
+		except IOError as e:
+			print "[error]__pinDigitalWrite raise Exception:" + str(e)
 			return False
 		return True;
 
 	def __moveServo(self, name, value):
 		if not self.__isEnable(name) :
-			print "%s is disable, move it failed!" % (name)
+			print "[error]%s is disable, move it failed!" % (name)
 			return False
 		value = value + self.__getTrim(name)
 		if self.__getMax(name) < value:
@@ -368,17 +392,3 @@ class FritzRobot(object):
 	def getIR(self):
 		#TODO: newma
 		pass
-
-if __name__ == "__main__":
-
-	robot = FritzRobot()
-
-	port = robot.findBoard()
-	if port != None :
-		print "found board on port %s" % (port)
-
-	if robot.isConnected():
-		robot.loadConfig()
-		#robot.moveJaw(100)
-	robot.close()
-

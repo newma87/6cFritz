@@ -55,8 +55,10 @@ void initialize()
 void setup()
 {
   Serial.begin(57600);
- mySerial.begin(9600);
+  mySerial.begin(9600);
   ss_Init();
+
+  mySerial.println("setup over!");
 }
 
 int readPacket()
@@ -80,10 +82,10 @@ int readPacket()
     g_command = Serial.read();
   }
   while ((g_command&128)==0);
- mySerial.println(g_command);
   g_message[0] = crc = g_command;
   g_command^=128;
 
+  //mySerial.println(g_command);
   while (Serial.available() <= 0) continue;
   g_length = g_message[1] = Serial.read();
   crc ^= g_length;
@@ -96,7 +98,8 @@ int readPacket()
     crc ^= high;
     g_messageTop=3;
   }
- mySerial.println(g_length);
+
+  //mySerial.println(g_length);
   // read in entire message
   if (g_length>0)
   {
@@ -112,7 +115,9 @@ int readPacket()
     while (Serial.available() <= 0) continue;
     g_message[g_messageTop++] = g_crc = Serial.read();
 
-    if ((crc&127)!=(g_crc&127)) return 0;
+    if ((crc&127)!=(g_crc&127)) {
+      return 0;
+    }
   }
   return 1;
 }
@@ -258,9 +263,10 @@ void loop()
 
   while (Serial.available()>0)
   {
-    if (readPacket()==0) 
+    if (readPacket()==0) {
       return;
-
+    }
+    mySerial.println(g_command);
     switch (g_command)
     {
       // init
@@ -275,9 +281,11 @@ void loop()
         echoPacket();
       break;
       case  ARDUINO_SET_SERVO:
+        mySerial.println("set servo");
         g_channel = g_message[2];
         g_value = g_message[3] | (g_message[4]<<7);
-
+        mySerial.println(g_channel);
+        mySerial.println(g_value);
         ss_SetPosition(g_channel, g_value);
 
         g_heartBeat[g_channel]=millis();
@@ -309,20 +317,15 @@ void loop()
           g_message[1]=g_count+1;
           g_message[2]=0;
         }
-       mySerial.println(g_count + 1);
         crc=g_message[0]^g_message[1]^g_message[2];
 
 	for (j=3,i=0;i<g_count;i+=2,j+=2)
 	{
 	  g_message[j] = g_config[i];
 	  g_message[j+1] = g_config[i+1];
-  mySerial.print(g_config[i]);
-  mySerial.print(" ");
-  mySerial.println(g_config[i + 1]);
 	  crc=crc^g_message[j]^g_message[j+1];
 	}
 	g_message[j]=crc&127;
- mySerial.print("load config response:");
 	for (i=3;i<j;i+=10)
         {
            trimVal = g_message[i] | (g_message[i+1]<<7);
@@ -341,11 +344,11 @@ void loop()
             if (val<minVal) val=minVal;
             if (val>maxVal) val=maxVal;
             ss_SetPosition(pin, val+1500);
-           g_heartBeat[pin]=millis();
+            g_heartBeat[pin]=millis();
           }
         }
 
-	Serial.write(g_message, j+1);
+	    Serial.write(g_message, j+1);
       break;
       case ARDUINO_SAVE_CONFIG:
 
@@ -360,10 +363,10 @@ void loop()
         g_message[0]=g_command|128;
         g_message[1]=0;
         g_message[2]=0;
-	Serial.write(g_message, 3);
+	      Serial.write(g_message, 3);
       break;
-      case ARDUINO_RESET:
 
+case ARDUINO_RESET:
 	for (i=0;i<MAX_CONFIG;i+=10)
         {
            trimVal = g_config[i] | (g_config[i+1]<<7);
@@ -424,7 +427,7 @@ void loop()
         g_message[0]=g_command|128;
         g_message[1]=0;
         g_message[2]=0;
-	Serial.write(g_message, 3);
+	      Serial.write(g_message, 3);
       break;
     }
   }
