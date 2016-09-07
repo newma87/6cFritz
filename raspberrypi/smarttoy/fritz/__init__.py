@@ -59,13 +59,18 @@ class FritzRobot(object):
 
 		shortArray = self.__serialConfig()
 		try:
+			self.__clearSerialPortData()
 			self.serial.write(self.protocol.packShortArrayCommand(Protocol.ARDUINO_SAVE_CONFIG, shortArray))
 			self.serial.flush()
 			# read response
-			byteArray = self.serial.read(3)
+			response_bytes = 3
+			if not self.__waitFortSerialPortData(response_bytes, timeoutSeconds = 5):
+				print '[error]Wait for saving config response head{count:%d} time out' % response_bytes
+				return False
+			byteArray = self.serial.read(response_bytes)
 			command, _ = self.protocol.unpackResponseHead(byteArray)
 			if command != Protocol.ARDUINO_SAVE_CONFIG :
-				print "[warn]Print save config response is not correct"
+				print "[warn]Save config response is not correct, please try again!"
 			return True
 		except IOError as e:
 			print "saveConfig raise Exception:" + str(e)
@@ -77,15 +82,13 @@ class FritzRobot(object):
 			return False
 
 		try:
-			byte2Read = self.serial.inWaiting()
-			if byte2Read > 0:
-				self.serial.read(byte2Read) # read when there some dirty data stay in the serial port input buffer
+			self.__clearSerialPortData()
 			self.serial.write(self.protocol.packCommand(Protocol.ARDUINO_LOAD_CONFIG, [85]))
 			self.serial.flush()
 
 			head_byte_count = 3
 			if not self.__waitFortSerialPortData(head_byte_count, timeoutSeconds = 5) : # wait util data prepare
-				print '[error]Load config response read head data{count:%d} time out' % head_byte_count
+				print '[error]Wait for Loading config response head{count:%d} time out' % head_byte_count
 				return False
 			byteArray = self.serial.read(head_byte_count)
 			command, count = self.protocol.unpackResponseHead(byteArray)
@@ -96,9 +99,8 @@ class FritzRobot(object):
 				return False
 
 			byteArray = self.__readSerial(count)
-			#self.__dumpRobotState()
 			self.__unserialConfig(self.protocol.unpackByteArray2ShortArray(byteArray))
-			self.__dumpRobotState()
+			#self.dumpRobotState()
 			return True
 		except IOError as e:
 			print "[error]LoadConfig raise Exception:" + str(e)
@@ -126,9 +128,6 @@ class FritzRobot(object):
 				if __WAIT_FOR_RESET__ == True:
 					print "[info]Waitting for arduino reset ..."
 					sleep(3)  # wait for arduino reset when serial port has been opened
-				byte2Read = s.inWaiting()
-				if byte2Read > 0:
-					s.read(byte2Read)  # read when there some dirty data stay in the serial port input buffer
 				print "[info]Checking port %s ..." % p.device
 				s.write(self.protocol.packCommand(Protocol.ARDUINO_GET_ID))
 				s.flush()
@@ -156,6 +155,11 @@ class FritzRobot(object):
 			if (time.clock() - start_second) > timeoutSeconds:
 				return False
 		return True
+
+	def __clearSerialPortData(self):
+		byte2Read = self.serial.inWaiting()
+		if byte2Read > 0:
+			self.serial.read(byte2Read) # read when there some dirty data stay in the serial port input buffer
 
 	def __readSerial(self, byteLen):
 		byteArray = []
@@ -241,7 +245,7 @@ class FritzRobot(object):
 					conf['enable'] = (shortArray[i * 5 + 4] != 0)
 			i += 1
 
-	def __dumpRobotState(self):
+	def dumpRobotState(self):
 		for item in self.__SAVE_ORDER__:
 			if item == None:
 				continue
@@ -259,10 +263,21 @@ class FritzRobot(object):
 			print "[error]Device is disconnection, please use findBoard to connect to device on serial port"
 			return False
 
+
 		buf = self.protocol.packShortPinValue(Protocol.ARDUINO_SET_SERVO, pin, value + 1500)
 		try:
+			self.__clearSerialPortData()
 			self.serial.write(buf)
 			self.serial.flush()
+			# read response from arduino, this response must be exactly equal to commands sended to arduino
+			response_bytes = len(buf)
+			if not self.__waitFortSerialPortData(response_bytes, timeoutSeconds = 5):
+				print "[error]__pinDigitalWrite: send command failed, please try again!"
+				return False
+			response = self.serial.read(response_bytes)
+			if len([item for item in buf if item not in response]) > 0: # compare diff between sended commands and response
+				print "[error]__pinDigitalWrite: response message is not equal to the command that have been sended"
+				return False
 		except IOError as e:
 			print "[error]__pinDigitalWrite raise Exception:" + str(e)
 			return False
@@ -302,43 +317,43 @@ class FritzRobot(object):
 		return self.__moveServo('leftHorizontalEye', value)
 
 	def leftVerticalEyeConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('leftVerticalEye', trim, min, max, pin, enable)
 
 	def moveLeftVerticalEyeConfig(self, value):
 		return self.__moveServo('leftVerticalEye', value)
 
 	def leftEyeBrowConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('leftEyebrow', trim, min, max, pin, enable)
 
 	def moveLeftEyeBrow(self, value):
 		return self.__moveServo('leftEyebrow', value)
 
 	def leftLidPositionConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('leftLidPosition', trim, min, max, pin, enable)
 
 	def moveLeftLidPosition(self, value):
 		return self.__moveServo('leftLidPosition', value)
 
 	def leftLipConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('leftLip', trim, min, max, pin, enable)
 
 	def moveLeftLip(self, value):
 		return self.__moveServo('leftLip', value)
 
 	def rightHorizontalEyeConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('rightHorizontalEye', trim, min, max, pin, enable)
 
 	def moveRightHorizontalEye(self, value):
 		return self.__moveServo('rightHorizontalEye', value)
 
 	def rightVerticalEyeConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('rightVerticalEye', trim, min, max, pin, enable)
 
 	def moveRightVerticalEye(self, value):
 		return self.__moveServo('rightVerticalEye', value)
 
 	def rightEyeBrowConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
-		self.__setConfig('leftHorizontalEye', trim, min, max, pin, enable)
+		self.__setConfig('rightEyebrow', trim, min, max, pin, enable)
 
 	def moveRightEyeBow(self, value):
 		return self.__moveServo('rightEyebrow', value)

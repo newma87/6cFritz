@@ -266,7 +266,6 @@ void loop()
     if (readPacket()==0) {
       return;
     }
-    mySerial.println(g_command);
     switch (g_command)
     {
       // init
@@ -281,11 +280,8 @@ void loop()
         echoPacket();
       break;
       case  ARDUINO_SET_SERVO:
-        mySerial.println("set servo");
         g_channel = g_message[2];
         g_value = g_message[3] | (g_message[4]<<7);
-        mySerial.println(g_channel);
-        mySerial.println(g_value);
         ss_SetPosition(g_channel, g_value);
 
         g_heartBeat[g_channel]=millis();

@@ -43,12 +43,11 @@ class Protocol (object):
 		buf = [chr(command | 128)]
 		dLen = len(byteArray)
 		# add length
-		if (command ^ 128) >= 32:
+		if command >= 32:
 			buf.append(chr(dLen  & 127))
-			buf.append(chr((dLen >> 7) & 255))
+			buf.append(chr((dLen >> 7) & 127))
 		else:
 			buf.append(chr(dLen & 127)) # 0 - 7 validate bit
-	
 		#add data
 		if dLen > 0:
 			for byte in byteArray:
@@ -61,10 +60,10 @@ class Protocol (object):
 		return buf
 
 	def packShortPinValue(self, command, pin, val):
-		return self.packCommand(command, [(pin & 127), (val & 127), ((val >> 7) & 255)])
+		return self.packCommand(command, [(pin & 127), (val & 127), ((val >> 7) & 127)])
 
 	def packIntPinValue(self, command, pin, val):
-		return self.packCommand(command, [(pin & 127), (val & 127), ((val >> 7) & 255), ((val >> 14) & 255), ((val >> 21) & 255), ((val >> 28) & 255)])
+		return self.packCommand(command, [(pin & 127), (val & 127), ((val >> 7) & 127), ((val >> 14) & 127), ((val >> 21) & 127), ((val >> 28) & 127)])
 
 	def packBytePinValue(self, command, pin, val):
 		return self.packCommand(command, [(pin & 127), (val & 127)])
@@ -73,7 +72,7 @@ class Protocol (object):
 		byteArray = []
 		for s in shortArray:
 			byteArray.append(s & 127)
-			byteArray.append((s >> 7) & 255)
+			byteArray.append((s >> 7) & 127)
 
 		return self.packCommand(command, byteArray)
 
@@ -86,12 +85,12 @@ class Protocol (object):
 		shortArray = []
 		i = 0
 		while (i < length):
-			# byte array is odd, then abandon the last element
+			# If byte array is odd, then abandon the last element
 			if length - i == 1:
-				print "[warn]Protocol unpackByteArray2ShortArray: argument byteArray is odd"
+				print "[warn]Protocol unpackByteArray2ShortArray: argument byteArray is odd, ignore last element 0x%x" % (ord(byteArray[-1]))
 				break;
-			# limit short number in range of (8192, -8192)
-			num = (ord(byteArray[i]) & 127) | ((ord(byteArray[i + 1]) & 255) << 7)
+			num = (ord(byteArray[i]) & 127) | ((ord(byteArray[i + 1]) & 127) << 7)
+			# Because we lost two highest bits when saving it to arduino, so we assume number that larger than 8192 is a negative number! So we need to correct it by substracting 16384
 			if num > 8192:
 				num -= 16384
 			shortArray.append(num)
@@ -101,7 +100,7 @@ class Protocol (object):
 	def unpackResponseHead(self, byteArray):
 		command = ord(byteArray[0]) & 127
 		if command >= 32:
-			count = ((ord(byteArray[1]) & 127) | ((ord(byteArray[2]) & 255) << 7))
+			count = ((ord(byteArray[1]) & 127) | ((ord(byteArray[2]) & 127) << 7))
 		else:
 			count = ord(byteArray[1]) & 127
 		return command, count

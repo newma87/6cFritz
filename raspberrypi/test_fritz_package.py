@@ -1,4 +1,5 @@
 from smarttoy.fritz import FritzRobot
+from time import sleep
 
 if __name__ == "__main__":
 	robot = FritzRobot()
@@ -9,5 +10,8 @@ if __name__ == "__main__":
 
 	if robot.isConnected():
 		robot.loadConfig()
+		robot.jawConfig(pin = 1, min = -100, max = 300)
 		robot.moveJaw(100)
+		robot.saveConfig()
+
 	robot.close()
