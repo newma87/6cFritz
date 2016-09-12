@@ -27,15 +27,35 @@ class BaseRobot(object):
             print "not found board"
             exit()
         if not self.robot.state.get("leftLidPosition").get("pin")== config.get("leftLidPosition").get("pin"):
-            self.robot.leftLidPositionConfig(config.get("leftLidPosition").get("trim"), config.get("leftLidPosition").get("min"), config.get("leftLidPosition").get("max"), config.get("leftLidPosition").get("pin"), config.get("leftLidPosition").get("enable"))
+            self.robot.leftLidPositionConfig(config.get("leftLidPosition").get("trim"),
+                                             config.get("leftLidPosition").get("min"),
+                                             config.get("leftLidPosition").get("max"),
+                                             config.get("leftLidPosition").get("pin"),
+                                             config.get("leftLidPosition").get("enable"))
         if not self.robot.state.get("rightLidPosition").get("pin")== config.get("rightLidPosition").get("pin"):
-            self.robot.rightLidPositionConfig(config.get("rightLidPosition").get("trim"), config.get("rightLidPosition").get("min"), config.get("rightLidPosition").get("max"), config.get("rightLidPosition").get("pin"), config.get("rightLidPosition").get("enable"))
+            self.robot.rightLidPositionConfig(config.get("rightLidPosition").get("trim"),
+                                              config.get("rightLidPosition").get("min"),
+                                              config.get("rightLidPosition").get("max"),
+                                              config.get("rightLidPosition").get("pin"),
+                                              config.get("rightLidPosition").get("enable"))
         if not self.robot.state.get("leftEyebrow").get("pin")== config.get("leftEyebrow").get("pin"):
-            self.robot.leftEyeBrowConfig(config.get("leftEyebrow").get("trim"), config.get("leftEyebrow").get("min"), config.get("leftEyebrow").get("max"), config.get("leftEyebrow").get("pin"), config.get("leftEyebrow").get("enable")) 
+            self.robot.leftEyeBrowConfig(config.get("leftEyebrow").get("trim"),
+                                         config.get("leftEyebrow").get("min"),
+                                         config.get("leftEyebrow").get("max"),
+                                         config.get("leftEyebrow").get("pin"),
+                                         config.get("leftEyebrow").get("enable")) 
         if not self.robot.state.get("rightEyebrow").get("pin")== config.get("rightEyebrow").get("pin"):
-            self.robot.rightEyeBrowConfig(config.get("rightEyebrow").get("trim"), config.get("rightEyebrow").get("min"), config.get("rightEyebrow").get("max"), config.get("rightEyebrow").get("pin"), config.get("rightEyebrow").get("enable"))     
+            self.robot.rightEyeBrowConfig(config.get("rightEyebrow").get("trim"),
+                                          config.get("rightEyebrow").get("min"),
+                                          config.get("rightEyebrow").get("max"),
+                                          config.get("rightEyebrow").get("pin"),
+                                          config.get("rightEyebrow").get("enable"))     
         if not self.robot.state.get("jaw").get("pin")== config.get("jaw").get("pin"):
-            self.robot.jawConfig(config.get("jaw").get("trim"), config.get("jaw").get("min"), config.get("jaw").get("max"), config.get("jaw").get("pin"), config.get("jaw").get("enable"))    
+            self.robot.jawConfig(config.get("jaw").get("trim"),
+                                 config.get("jaw").get("min"),
+                                 config.get("jaw").get("max"),
+                                 config.get("jaw").get("pin"),
+                                 config.get("jaw").get("enable"))    
         self.robot.saveConfig()
 
     #this function can use lamda and dict
@@ -65,11 +85,11 @@ class BaseRobot(object):
 
     #move brows only
     def fury(self,duration):
-        self.robot.moveLeftLidPosition(config.get("leftLidPosition").get("trim")-20)
-        self.robot.moveRightLidPosition(config.get("rightLidPosition").get("trim")-20)
+        self.robot.moveLeftLidPosition(config.get("leftLidPosition").get("trim") - 20)
+        self.robot.moveRightLidPosition(config.get("rightLidPosition").get("trim") - 20)
         i = 0
-        while(i< duration):
-            if i%2:
+        while(i < duration):
+            if i % 2:
                 self.robot.moveLeftEyeBrow(config.get("leftEyebrow").get("max"))
                 self.robot.moveRightEyeBrow(config.get("rightEyebrow").get("max"))
                 time.sleep(0.2)
@@ -95,12 +115,12 @@ class BaseRobot(object):
     def sleepy(self, duration):
         i= 1
         angle= config.get("leftLidPosition").get("trim")
-        while (i<duration and angle> min):
+        while (i < duration and angle> min):
             angle+=i*(-10) 
             self.robot.moveLeftLidPosition(angle)
             self.robot.moveRightLidPosition(angle)
             time.sleep(1)
-            if not i%5:
+            if not i % 5:
                 angle= max
                 self.robot.moveLeftLidPosition(angle)
                 self.robot.moveRightLidPosition(angle)
@@ -147,11 +167,11 @@ class BaseRobot(object):
             'fury':self.fury,
             'sleepy':self.sleepy,
             'speaking':self.speaking
-                    }.get("expression")(duration)
+                    }.get(expression)(duration)
         self.normal(1)
 #test
 config = { 
-			"leftHorizontalEye" :  { "trim": 0, "min": -1000, "max": 1000, "pin": -1, "enable": False },
+	"leftHorizontalEye" :  { "trim": 0, "min": -1000, "max": 1000, "pin": -1, "enable": False },
 			"leftVerticalEye" :  { "trim": 0, "min": -1000, "max": 1000, "pin": -1, "enable": False },
 			"leftEyebrow" :  { "trim": 0, "min": -300, "max": 100, "pin": 8, "enable": True },
 			"leftLidPosition" :  { "trim": -50, "min": -150, "max": 100, "pin": 2, "enable": True },

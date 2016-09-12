@@ -355,7 +355,7 @@ class FritzRobot(object):
 	def rightEyeBrowConfig(self, trim = None, min = None, max = None, pin = None, enable = True):
 		self.__setConfig('rightEyebrow', trim, min, max, pin, enable)
 
-	def moveRightEyeBow(self, value):
+	def moveRightEyeBrow(self, value):
 		return self.__moveServo('rightEyebrow', value)
 
 	def rightLidPositionConfig(self, trim = None, min = None, max = None, pin = None, enable = True):

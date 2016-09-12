@@ -17,7 +17,7 @@ import wave
 
 CHANNELS = 1
 WIDTH = 2
-RATE = 8000
+RATE = 44100
 
 class MyRecordTest(audio.AudioRecordCallback):
 	def __init__(self):
