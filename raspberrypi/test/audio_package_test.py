@@ -61,8 +61,9 @@ class MyPlayTest(audio.AudioPlayCallback):
 		self.play = audio.AudioPlayer(config, self)
 		self.count = 0
 
-	def onPlayEndCallback(self, bytesCount, frame_count, obj):
+	def onPlayEndCallback(self, obj):
 		if self.count >= 1:
+			os.remove(temp_audio_file) # delete audio file
 			return True     # import: if this is not return True, then the play wan't be stopped
 		else:
 			print "play end, replay once more!"
@@ -86,14 +87,15 @@ class MyPlayTest(audio.AudioPlayCallback):
 	def testSync(self):
 		self.play.syncPlay(self.play_data)
 
+temp_audio_file = 'abc.wav'
+
 if __name__ == '__main__':
-	print "record to file abc.wav"
+	#print "record to file abc.wav"
 	test = MyRecordTest()
-	test.test('abc.wav')
+	test.test(temp_audio_file)
 
-
-	test1 = MyPlayTest('abc.wav')
-	print "async play abc.wav file"
-	test1.testAsync()
+	test1 = MyPlayTest(temp_audio_file)
+	print "async play %s file" % (temp_audio_file)
 	#test1.testAsync()
-	#test1.testSync()
+	test1.testSync()
+	os.remove(temp_audio_file)

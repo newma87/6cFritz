@@ -2,32 +2,69 @@
 
 """
 	Created by newma
-"""
+
+	AudioRecorder usage:
+	-----------------------------------------------------------------------------
+		class RecordCallback(audio.AudioRecordCallback):
+			def __init__(self):
+				pass
+			def onRecordData(self, in_data, bytesCount, frame_count, obj):
+				# write record data to file
+				wavFile.writeframes(in_data)
+
+		config = audio.util.AudioConfig(sample_rate, chennel, smaple_width)
+		recorder = audio.AudioRecorder(config, RecordCallback())
+		recorder.prepare()
+		recorder.start()
+		time.sleep(RECORD_SECONDS)
+		recorder.stop()
+		recorder.terminate()
+	------------------------------------------------------------------------------
+
+	AudioPlayer usage:
+	1, sync play
+	------------------------------------------------------------------------------
+		config = audio.util.AudioConfig(sample_rate, chennel, smaple_width)
+		player = audio.AudioPlayer(config)
+		player.syncPlay(wavFile.readframes(wavFile.getnframes())) # or player.syncPlay(sound_pcm_data)
+	------------------------------------------------------------------------------
+	
+	2, async play (Importance: Note that this operation is not stable, the play quality is not guarantee !!!)
+	------------------------------------------------------------------------------
+		class PlayCallback(audio.AudioPlayCallback):
+			def __init__(self):
+				pass
+
+			# Please keep it in your mind, this method is called in another thread !!!
+			# So don't call the AudioPlayer.terminate or AudioPlayer.stop to stop it, or it will fire exception
+			# If return False, the play will play again and also call this callback again when play end.
+			def onRecordData(self, in_data, bytesCount, frame_count, obj):
+				print "play end"
+				return True			
+
+		config = audio.util.AudioConfig(sample_rate, chennel, smaple_width)
+		player = audio.AudioPlayer(config, PlayCallback())
+		player.prepare()
+		player.start()
+		while player.isPlaying():
+			# do something others
+			time.sleep(0.1)
+		player.stop()
+		player.terminate()
+	------------------------------------------------------------------------------
+"""	
 
 import util
-from abc import ABCMeta, abstractmethod
 from smarttoy.singleton import singletonclass
 import pyaudio
 
 from array import array
 
-__all__ = ["util"]
+__all__ = ["callback", "util"]
 
 __author__ = ["newma<newma@live.cn>"]
 
-class AudioRecordCallback(object):
-	__metaclass__ = ABCMeta
-
-	@abstractmethod
-	def onRecordData(self, in_data, bytesCount, frame_count, obj):
-		pass
-
-class AudioPlayCallback(object):
-	__metaclass__ = ABCMeta
-
-	@abstractmethod
-	def onPlayEndCallback(self, bytesCount, frame_count, obj):
-		pass
+from callback import AudioRecordCallback, AudioPlayCallback
 
 class BaseAudio(object):
 	"""docstring for BaseAudio"""
@@ -112,7 +149,7 @@ class AudioRecorder(BaseAudio):
 
 @singletonclass
 class AudioPlayer(BaseAudio):
-	__WRITE_CHUNK__  = 1024
+	__WRITE_FRAMES__  = 1024
 
 	"""docstring for AudioPlayer"""
 	def __init__(self, audioConfig = None, callback = None):
@@ -143,15 +180,18 @@ class AudioPlayer(BaseAudio):
 				print "[warin]AudioPlayer.syncPlay: async play is prepared but not play, it will be terminate!"
 				self.terminate()
 
+		# calculate read bytes size each time
+		bytesSize = self.__WRITE_FRAMES__ * self.config.channel * self.config.bytes
+
 		self.audio = pyaudio.PyAudio()
 		self.stream = self.audio.open(format = self.config.get_pa_format(),
                 channels = self.config.get_pa_channel(),
                 rate = self.config.get_pa_rate(),
                 output = True,
-                frames_per_buffer = AudioPlayer.__WRITE_CHUNK__)
-		while len(dnf_data) >= AudioPlayer.__WRITE_CHUNK__ :
-			data = dnf_data[: AudioPlayer.__WRITE_CHUNK__]
-			dnf_data = dnf_data[AudioPlayer.__WRITE_CHUNK__ :]
+                frames_per_buffer = bytesSize)
+		while len(dnf_data) >= bytesSize :
+			data = dnf_data[: bytesSize]
+			dnf_data = dnf_data[bytesSize :]
 			self.stream.write(data)
 
 		if len(dnf_data) > 0:
@@ -190,7 +230,7 @@ class AudioPlayer(BaseAudio):
 		if self.__data == None and self.__playStarted:
 			self.__playStarted = False
 			if self.__callback != None:
-				if self.__callback.onPlayEndCallback(self, bytesSize, frame_count): # if callback return True then complete this playing
+				if self.__callback.onPlayEndCallback(self): # if callback return True then complete this playing
 					return None, pyaudio.paComplete
 		# if play is not complete, check self.__data, if it is empty then create mute data else play it's data
 		retData = None
