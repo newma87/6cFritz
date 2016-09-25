@@ -1,4 +1,7 @@
 #-*- encoding:utf-8 -*-
+"""
+	Created by newma<newma@live.cn>
+"""
 
 import util
 import os
@@ -6,6 +9,9 @@ from json import *
 import types
 
 class UserDefault(object):
+	"""
+		Used to storage some permanent user data
+	"""
 
 	def __init__(self, storage_file = 'app_data_storage.json', storage_dir = '.smarttoy'):
 		self.json_file = storage_file

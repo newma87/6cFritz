@@ -1,4 +1,7 @@
 #-*- encoding: utf-8 -*-
+"""
+	Created by newma<newma@live.cn>
+"""
 
 import platform
 os_type = platform.system()
@@ -14,6 +17,11 @@ except ImportError as e:
 	exit()
 
 def getUserDataFold():
+	"""
+		get current user folder path
+		On windows is some kind of lik "C:\\Document and Settings\\USER_NAME\\AppData"
+		On linux is "$HOME" path
+	"""
 	if (os_type == "Linux"):
 		return os.environ['HOME']
 	elif (os_type == "Windows"):
