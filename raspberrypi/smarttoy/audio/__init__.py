@@ -59,6 +59,7 @@ from smarttoy.singleton import singletonclass
 import pyaudio
 
 from array import array
+import wave
 
 __all__ = ["callback", "util"]
 
@@ -69,7 +70,7 @@ from callback import AudioRecordCallback, AudioPlayCallback
 class BaseAudio(object):
 	"""docstring for BaseAudio"""
 	def __init__(self, audioConfig = None):
-		if audioConfig.get_pa_format() == pyaudio.paInt8:
+		if audioConfig and audioConfig.get_pa_format() == pyaudio.paInt8:
 			print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 		self.config = audioConfig
 		self.audio = None
@@ -170,6 +171,14 @@ class AudioPlayer(BaseAudio):
 
 	def getCallback(self):
 		return self.__callback
+
+	def syncPlayWave(self, waveFile):
+		wf = wave.open(waveFile, "rb")
+		data = wf.readframes(wf.getnframes())
+		config = util.AudioConfig(sampleRate = wf.getframerate(), channel = wf.getnchannels(), bytes = wf.getsampwidth())
+		self.setAudioConfig(config)
+		wf.close()
+		self.syncPlay(data)
 
 	def syncPlay(self, dnf_data):
 		if self.audio != None:

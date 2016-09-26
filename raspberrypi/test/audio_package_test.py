@@ -17,7 +17,7 @@ import wave
 
 CHANNELS = 1
 WIDTH = 2
-RATE = 44100
+RATE = 8000
 
 class MyRecordTest(audio.AudioRecordCallback):
 	def __init__(self):
@@ -98,4 +98,4 @@ if __name__ == '__main__':
 	print "async play %s file" % (temp_audio_file)
 	#test1.testAsync()
 	test1.testSync()
-	os.remove(temp_audio_file)
+	#os.remove(temp_audio_file)

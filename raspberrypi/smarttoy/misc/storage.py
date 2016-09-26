@@ -8,6 +8,9 @@ import os
 from json import *
 import types
 
+from smarttoy.singleton import singletonclass
+
+@singletonclass
 class UserDefault(object):
 	"""
 		Used to storage some permanent user data
