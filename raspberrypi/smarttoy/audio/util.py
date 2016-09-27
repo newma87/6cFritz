@@ -59,5 +59,7 @@ def checkInputAudioConfigIsSupported(record_audio_conf):
 				raise AudioNotSupportException("[Error] Frame rate{%d} is not supported by default input device \"%s\"" % (record_audio_conf.get_pa_rate(), dev['name']))
 		else:
 			raise AudioNotSupportException("[Error] Not audio input device found!")
+	except ValueError:
+		raise AudioNotSupportException("[Error] Frame rate{%d} is not supported by default input device \"%s\"" % (record_audio_conf.get_pa_rate(), dev['name']))
 	finally:
 		pa.terminate()

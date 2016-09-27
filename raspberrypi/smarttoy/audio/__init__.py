@@ -71,10 +71,7 @@ from util import checkInputAudioConfigIsSupported
 class BaseAudio(object):
 	"""docstring for BaseAudio"""
 	def __init__(self, audioConfig = None):
-		if audioConfig != None:
-			if isinstance(self, AudioRecorder):
-				checkInputAudioConfigIsSupported(audioConfig)
-			if audioConfig.get_pa_format() == pyaudio.paInt8:
+		if audioConfig != None and audioConfig.get_pa_format() == pyaudio.paInt8:
 				print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 		self.config = audioConfig
 		self.audio = None
@@ -99,9 +96,7 @@ class BaseAudio(object):
 
 	def setAudioConfig(self, audioConfig):
 		self.config = audioConfig		
-		if self.config != None:
-			checkInputAudioConfigIsSupported(self.config)
-			if self.config.get_pa_format() == pyaudio.paInt8:
+		if self.config != None and self.config.get_pa_format() == pyaudio.paInt8:
 				print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 
 	def terminate(self):
@@ -120,6 +115,7 @@ class BaseAudio(object):
 class AudioRecorder(BaseAudio):
 	"""docstring for AudioRecorder"""
 	def __init__(self, audioConfig = None, callback = None):
+		checkInputAudioConfigIsSupported(audioConfig)
 		BaseAudio.__init__(self, audioConfig)
 		self.input = True
 		self.output = False
@@ -132,6 +128,11 @@ class AudioRecorder(BaseAudio):
 			print "[error]AudioRecorder: ctor argument callback must be a type of AudioRecordCallback"
 		else:
 			self.__callback = callback
+
+	def setAudioConfig(self, audioConfig):
+		if self.config != None:
+			checkInputAudioConfigIsSupported(self.config)
+		BaseAudio.setAudioConfig(self, audioConfig)
 
 	def getCallback(self):
 		return self.__callback
