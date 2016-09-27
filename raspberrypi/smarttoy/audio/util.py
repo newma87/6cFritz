@@ -39,3 +39,25 @@ class AudioConfig(object):
 
 	def get_pa_rate(self):
 		return self.sampleRate
+
+class AudioNotSupportException(Exception):
+	def __init__(self, message):
+		Exception.__init__(self)
+		self.msg = message
+
+	def __str__(self):
+		return repr(self.msg)	
+
+def checkInputAudioConfigIsSupported(record_audio_conf):
+	pa = pyaudio.PyAudio()
+	try:
+		dev = pa.get_default_input_device_info()
+		if dev != None:
+			if dev['maxInputChannels'] < record_audio_conf.get_pa_channel():
+				raise AudioNotSupportException("[Error] Channels{%d} is not supported by default input device \"%s\"" % (record_audio_conf.get_pa_channel(), dev['name']))
+			elif not pa.is_format_supported(record_audio_conf.get_pa_rate(), dev['index'], dev['maxInputChannels'], record_audio_conf.get_pa_format()):
+				raise AudioNotSupportException("[Error] Frame rate{%d} is not supported by default input device \"%s\"" % (record_audio_conf.get_pa_rate(), dev['name']))
+		else:
+			raise AudioNotSupportException("[Error] Not audio input device found!")
+	finally:
+		pa.terminate()

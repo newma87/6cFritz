@@ -66,12 +66,15 @@ __all__ = ["callback", "util"]
 __author__ = ["newma<newma@live.cn>"]
 
 from callback import AudioRecordCallback, AudioPlayCallback
+from util import checkInputAudioConfigIsSupported
 
 class BaseAudio(object):
 	"""docstring for BaseAudio"""
 	def __init__(self, audioConfig = None):
-		if audioConfig and audioConfig.get_pa_format() == pyaudio.paInt8:
-			print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
+		if audioConfig != None:
+			checkInputAudioConfigIsSupported(audioConfig)
+			if audioConfig.get_pa_format() == pyaudio.paInt8:
+				print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 		self.config = audioConfig
 		self.audio = None
 		self.stream = None
@@ -95,6 +98,10 @@ class BaseAudio(object):
 
 	def setAudioConfig(self, audioConfig):
 		self.config = audioConfig		
+		if self.config != None:
+			checkInputAudioConfigIsSupported(self.config)
+			if self.config.get_pa_format() == pyaudio.paInt8:
+				print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 
 	def terminate(self):
 		if self.stream != None :
