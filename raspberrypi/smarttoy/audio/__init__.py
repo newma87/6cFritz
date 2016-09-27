@@ -72,7 +72,8 @@ class BaseAudio(object):
 	"""docstring for BaseAudio"""
 	def __init__(self, audioConfig = None):
 		if audioConfig != None:
-			checkInputAudioConfigIsSupported(audioConfig)
+			if isinstance(self, AudioRecorder):
+				checkInputAudioConfigIsSupported(audioConfig)
 			if audioConfig.get_pa_format() == pyaudio.paInt8:
 				print "[warn]Current is not stable in recording 8bits per sample. Recommand using 16bits per sample instead!"
 		self.config = audioConfig
