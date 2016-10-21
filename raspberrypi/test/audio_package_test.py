@@ -4,10 +4,9 @@
 	Created by newma<newma@live.cn>
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from context import smarttoy
 
+import os
 from smarttoy import audio
 from smarttoy.audio import util
 from time import sleep

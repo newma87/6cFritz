@@ -8,10 +8,9 @@
     ubuntu install ffmpeg: sudo apt-get install ffmpeg
 """
 
-import sys
-import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from context import smarttoy
 
+import os
 from smarttoy.misc import tulingrobot as tr
 from smarttoy.voicerecognize import baiduEngine as baidu
 from smarttoy import audio
