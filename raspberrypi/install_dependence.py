@@ -8,6 +8,7 @@ import os
 import sys
 import shutil
 import networkspeed as ns
+import platform
 
 from time import sleep
 
@@ -86,6 +87,17 @@ def untarFile(package):
 	tar.close()
 	return package[:package.rfind('.tar')]
 
+def runCommand(cmd, cwd = None):
+	try:
+		if cwd != None:
+			subprocess.Popen(cmd, shell = True, cwd = cwd).wait()
+		else:
+			subprocess.Popen(cmd, shell = True).wait()
+	except OSError as er:
+		print er.child_traceback
+		return False
+	return True
+
 #==========================mpg123 install=========================================
 def checkMpg123Installed():
 	return os.path.exists('/usr/local/lib/libmpg123.so') or os.path.exists('/usr/lib/libmpg123.so')
@@ -101,7 +113,7 @@ def downloadMpg123():
 	return download(download_url)
 
 def installMpg123():
-	if sys.platform.find("win") > 0:
+	if sys.platform.find("win") >= 0:
 		print "Sorry, you have to manually install mpg123 package on windows"
 		return
 
@@ -138,7 +150,7 @@ def downloadAudioTools():
 	return download(download_url)
 
 def installAudioTools():
-	if sys.platform.find("win") > 0:
+	if sys.platform.find("win") >= 0:
 		print "Sorry, you have to manually install audiotools package on windows"
 		return
 
@@ -151,12 +163,10 @@ def installAudioTools():
 	install_dir = untarFile(gzFile)
 
 	print "Installing audiotools..."
-	try:
-		subprocess.Popen('make install', shell = True, cwd = install_dir).wait()
+	if runCommand('make install', cwd = install_dir):
 		print "Install audiotools done!"
-	except OSError as er:
-		print er.child_traceback
-		print "[error] Installing audiotools failed!"
+	else:
+		print "[error] Installing audiotools failed!"		
 
 	#remove tmp file
 	os.remove(gzFile)
@@ -164,23 +174,61 @@ def installAudioTools():
 
 #==========================pyaudio install=========================================
 def installPyAudio():
-	if sys.platform.find("win") > 0:
-		print "Sorry, you have to manually install pyaudio package on windows"
-		return
-
-	dist = getLinuxDistro()
-	cmd = None
-	if dist == 'fedora' or dist == 'centos' or dist == 'redhat':
-		cmd = "sudo yum install -y pyaudio"
+	if platform.system().find("Windows") >= 0:
+		print "[Error] Sorry, auto installing pyaudio on Windows os is not supported currentlly, you have to install it manually!"
+	elif platform.system().find("Darwin") >= 0:
+		print "[Error] Sorry, auto installing pyaudio on Mac os is not supported currentlly, you have to install it manually!"
 	else:
-		cmd = "sudo apt-get install -y python-pyaudio"
-	try:
-		subprocess.Popen(cmd, shell = True).wait()
-		print "Install pyaudio done!"
-	except OSError as er:
-		print er.child_traceback
-		print "[error] Installing pyaudio failed!"	
+		dist = getLinuxDistro()
+		cmd = None
+		if dist == 'fedora' or dist == 'centos' or dist == 'redhat':
+			cmd = "sudo yum install -y pyaudio"
+		elif dist == 'debain' or dist == 'ubuntu':
+			cmd = "sudo apt-get install -y python-pyaudio"
+		else:
+			print "[Error] Sorry, auto installing pyaudio on \'%s\'' is not supported currentlly, you have to install it manually!" % (dist)
+			return
 
+		print "Installing pyaudio..."
+		if runCommand(cmd):
+			print "Install pyaudio done!"
+		else:
+			print "[error] Installing pyaudio failed!"
+
+#===========================tkinter instal========================================
+def checkTkinterInstalled():
+	try:
+		import Tkinter
+	except ImportError:
+		return False
+	return True
+
+def installTkinter():
+	osType = platform.system()
+	dist = platform.platform()
+
+	if osType.find('Linux') >= 0:
+		dist = getLinuxDistro()
+		cmd = None
+		if dist == 'fedora' or dist == 'centos' or dist == 'redhat':
+			cmd = "sudo yum install -y tkinter"
+		elif dist == 'debain' or dist == 'ubuntu':
+			cmd = "sudo apt-get install -y python-tk"
+		else:
+			print "[Error] Sorry, auto installing tkinter on \'%s\'' is not supported currentlly, you have to install it manually!" % (dist)
+			return
+
+		print "Installing tkinter..."
+		if runCommand(cmd):
+			print "Install tkinter done!"
+		else:
+			print "[error] Installing tkinter failed!"
+	elif osType.find('Darwin') >= 0:
+		print "[Error] Sorry, auto installing pyaudio on Mac os is not supported currentlly, it is included in MacPython package manager, install it manually!"
+	elif osType.find('Windows') >= 0:
+		print "[Error] Sorry, auto installing pyaudio on Windows os is not supported currentlly, it is installed by Python Windows Installers!"
+	else:
+		print "[Error] Unknown os system \'%s\'" % (osType)
 #====================================================================================
 def main():
 	try:
@@ -205,6 +253,12 @@ def main():
 		print "pyaudio installed"
 	else:
 		installPyAudio()
+
+	#install tkinter
+	if checkTkinterInstalled():
+		print 'tkinter installed'
+	else:
+		installTkinter()
 
 if __name__ == '__main__':
 	main()
