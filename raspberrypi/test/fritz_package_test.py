@@ -12,21 +12,15 @@ if __name__ == "__main__":
 		print "found board on port %s" % (port)
 
 	if robot.isConnected():
-		print "load config..."
-		robot.loadConfig()
-		old = robot.state
-		print "change config..."
-		robot.jawConfig(pin = 1, min = -100, max = 300)
-		print "save config..."
-		robot.saveConfig()
-		print "current robot state:"
-		robot.dumpRobotState()
+		if not robot.loadConfig():
+			print 'load config failed'
+			exit()
+		robot.jawConfig(pin =9, min=-500, max = 500)
+		if not robot.saveConfig():
+			print 'save config failed'
+			exit()
 		sleep(0.5)
-		robot.moveJaw(100)
-		sleep(0.5)
-		print "restore config..."
-		robot.state = old
-		robot.saveConfig()
+		robot.moveJaw(300)
 		sleep(0.5)
 
 	robot.close()

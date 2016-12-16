@@ -6,5 +6,9 @@
 	(Act like android<handler, looper>)
 """
 
-__all__ = ['Event', 'Looper', 'Handler']
+__all__ = ['event', 'looper', 'handler']
 __author__ = ['newma<newma@live.cn>']
+
+import event
+import looper
+import handler

@@ -32,6 +32,20 @@ class Protocol (object):
 	ARDUINO_SAVE_CONFIG = 33
 	ARDUINO_SAVE_SEQUENCE = 34
 
+	@staticmethod
+	def calcCRC(initVal, byteArray, length= -1, offset = 0):
+		if length == -1:
+			length = len(byteArray)
+
+		crc = initVal
+
+		count = 0
+		while count < length:
+			crc ^= ord(byteArray[offset + count]) & 0xff
+			count += 1
+
+		return crc
+
 	def __init__(self):
 		pass
 
@@ -80,8 +94,10 @@ class Protocol (object):
 	def unpackVersion(self, byteArray):
 		return str(byteArray[ : -3]), int(byteArray[-3 : ])
 
-	def unpackByteArray2ShortArray(self, byteArray):
-		length = len(byteArray)
+	def unpackByteArray2ShortArray(self, byteArray, length = -1):
+		if length == -1:
+			length = len(byteArray)
+
 		shortArray = []
 		i = 0
 		while (i < length):

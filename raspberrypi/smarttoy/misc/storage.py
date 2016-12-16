@@ -3,14 +3,11 @@
 	Created by newma<newma@live.cn>
 """
 
-import util
+import filehelper as util
 import os
 from json import *
 import types
 
-from smarttoy.singleton import singletonclass
-
-@singletonclass
 class UserDefault(object):
 	"""
 		Used to storage some permanent user data
@@ -21,13 +18,13 @@ class UserDefault(object):
 		self.directory = storage_dir
 		self.valueMap = {} 
 
-	def getBool(self, name, defVal = False):
+	def getBool(self, name, default = False):
 		val = self.valueMap.get(name)
 		if (val == None):
-			return defVal
+			return default
 		if not (type(val) is types.BooleanType):
 			print "[warning]UserDefault.getBool: get the wrong type, return default value"
-			return defVal
+			return default
 		return val
 	def setBool(self, name, value):
 		if (not type(value) is types.BooleanType):
@@ -35,13 +32,13 @@ class UserDefault(object):
 			return
 		self.valueMap[name] = value
 
-	def getString(self, name, defVal = None):
+	def getString(self, name, default = None):
 		val = self.valueMap.get(name)
 		if (val == None):
-			return defVal
+			return default
 		if not (type(val) is types.StringType):
 			print "[warning]UserDefault.getString: get the wrong type, return default value"
-			return defVal
+			return default
 		return val
 	def setString(self, name, value):
 		if (not type(value) is types.StringType):
@@ -49,13 +46,13 @@ class UserDefault(object):
 			return
 		self.valueMap[name] = value
 
-	def getInt(self, name, defVal = 0):
+	def getInt(self, name, default = 0):
 		val = self.valueMap.get(name)
 		if (val == None):
-			return defVal
+			return default
 		if not (type(val) is types.IntType):
 			print "[warning]UserDefault.getInt: get the wrong type, return default value"
-			return defVal
+			return default
 		return val
 	def setInt(self, name, value):
 		if (not type(value) is types.IntType):
@@ -63,13 +60,13 @@ class UserDefault(object):
 			return
 		self.valueMap[name] = value
 
-	def getFloat(self, name, defVal = "0.0"):
+	def getFloat(self, name, default = "0.0"):
 		val = self.valueMap.get(name)
 		if (val == None):
-			return defVal
+			return default
 		if not (type(val) is types.FloatType):
 			print "[warning]UserDefault.getFloat: get the wrong type, return default value"
-			return defVal
+			return default
 		return val
 	def setFloat(self, name, value):
 		if (not type(value) is types.FloatType):
@@ -77,13 +74,13 @@ class UserDefault(object):
 			return
 		self.valueMap[name] = value
 
-	def getLong(self, name, defVal = 0):
+	def getLong(self, name, default = 0):
 		val = self.valueMap.get(name)
 		if (val == None):
-			return defVal
+			return default
 		if not (type(val) is types.LongType):
 			print "[warning]UserDefault.getLong: get the wrong type, return default value"
-			return defVal
+			return default
 		return val
 	def setLong(self, name, value):
 		if (not type(value) is types.LongType):
@@ -92,7 +89,7 @@ class UserDefault(object):
 		self.valueMap[name] = value
 
 	def save(self):
-		path = os.path.join(util.getUserDataFold(), self.directory)
+		path = self.directory #os.path.join(util.getUserHomeFold(), self.directory)
 		file = os.path.join(path, self.json_file)
 		if (not os.path.exists(path)):
 			os.makedirs(path)
@@ -108,15 +105,16 @@ class UserDefault(object):
 		fp.close()
 
 	def load(self):
-		path = os.path.join(util.getUserDataFold(), self.directory)
+		path = self.directory #os.path.join(util.getUserHomeFold(), self.directory)
 		file = os.path.join(path, self.json_file)
 		if (not os.path.exists(file)):
 			print "[warning]UserDefault.load: not storage file exits!"
-			return
+			return False
 		fp = open(file, 'r')
 		data = fp.read()
 		fp.close()
 		self.valueMap = JSONDecoder().decode(data)
+		return True
 
 	def dump(self):
 		keys = self.valueMap.keys()
@@ -135,3 +133,4 @@ if __name__ == '__main__':
 	ud.setInt("user_goal", 200)
 
 	ud.save()
+	util.removeNoemptyFold('.smarttoy')

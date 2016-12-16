@@ -1,14 +1,14 @@
 #-*- encoding:utf-8 -*-
 from context import smarttoy
 
-from smarttoy.thread import Event, Looper, Handler
+from smarttoy.thread import *
 import threading
 from time import sleep
 
 EVENT_EXIT = 1
 EVENT_SAY_HELLO = 2
 
-class MyHanlder(Handler.Handler):
+class MyHanlder(handler.Handler):
 	def handle_message(self, event):
 		eid = event.getId()
 		if eid == EVENT_EXIT:
@@ -20,7 +20,7 @@ class MyHanlder(Handler.Handler):
 class MyThread(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
-		self.looper = Looper.Looper()
+		self.looper = looper.Looper()
 		self.handler = MyHanlder(self.looper)
 
 	def getHandler(self):
