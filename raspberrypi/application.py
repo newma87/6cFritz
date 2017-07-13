@@ -2,10 +2,11 @@
 import Tkinter as tk
 import tkMessageBox
 import threading
-import __builtin__
+import os
 
 from smarttoy.thread import *
 from smarttoy.misc import storage as stg
+from smarttoy.singleton import *
 
 from avatar import Avatar
 from avatarhandler import *
@@ -13,11 +14,7 @@ from uihandler import *
 from ui import *
 import mainwidget as mw
 
-
-# shared object between modules
-__builtin__.app_instance = None
-__builtin__.app_lock = threading.Lock()
-
+@singletonclass
 class Application(object):
 	"""
 		Global singleton application, use Application() to create and get the application instance 
@@ -28,36 +25,20 @@ class Application(object):
 	WIN_POS_X = 'win_x'
 	WIN_POS_Y = 'win_y'
 
-	def __new__(cls):
-		if __builtin__.app_instance is None:
-			__builtin__.app_lock.acquire()
-			if __builtin__.app_instance is None:
-				__builtin__.app_instance = object.__new__(cls)
-				# Because the drawback of such singleton pattern which will call __init__ each time when Application() is invoted,
-				# so we have to initialize it here in stead of initializing in __init__()
-				__builtin__.app_instance.__init()
-			__builtin__.app_lock.release()
-		return __builtin__.app_instance
-
-	"""
-	# note: In this singleton, this method will be called each time when Application() invoted, so ignore this override method
 	def __init__(self):
-		object.__init__(self)
-	"""
-
-	def __init(self):
 		# create windows
 		self.master = tk.Tk()
 		self.master.geometry("720x640")
 		self.master.title('6cFritz')
-		img = tk.Image("photo", file="favor.png")
+		curDir = os.path.dirname(os.path.abspath(__file__))
+		img = tk.Image("photo", file=curDir + "/favor.png")
 		self.master.tk.call('wm','iconphoto', self.master._w, img)
 		self.master.resizable(width=False, height=False)
 		self.master.protocol("WM_DELETE_WINDOW", self.onDestory)
-		self.storage = stg.UserDefault(storage_file = Application.CONFIG_FILE, storage_dir = '.')
+		self.storage = stg.UserDefault(storage_file = self.CONFIG_FILE, storage_dir = '.')
 		if self.storage.load():
-			x = self.storage.getInt(Application.WIN_POS_X, default = -1)
-			y = self.storage.getInt(Application.WIN_POS_Y, default = -1)
+			x = self.storage.getInt(self.WIN_POS_X, default = -1)
+			y = self.storage.getInt(self.WIN_POS_Y, default = -1)
 			if x == -1 or y == -1:
 				center(self.master)
 			else:
@@ -93,12 +74,12 @@ class Application(object):
 
 	def mainloop(self):
 		self.uiLooper.prepare()
-		self.master.after(Application.UPDATE_RATE, self.update)
+		self.master.after(self.UPDATE_RATE, self.update)
 		self.master.mainloop()
 
 	def update(self):
 		self.uiLooper.dispatchOneMessage()
-		self.master.after(Application.UPDATE_RATE, self.update)
+		self.master.after(self.UPDATE_RATE, self.update)
 
 	def timer(self, delay, callback):
 		self.master.after(delay, callback)
@@ -141,14 +122,14 @@ class Application(object):
 			self.uiHandler.sendEvent(eve)
 
 	def onDestory(self):
-		self.storage.setInt(Application.WIN_POS_X, self.master.winfo_x())
-		self.storage.setInt(Application.WIN_POS_Y, self.master.winfo_y())
+		self.storage.setInt(self.WIN_POS_X, self.master.winfo_x())
+		self.storage.setInt(self.WIN_POS_Y, self.master.winfo_y())
 		self.storage.save()
 
 		self.master.destroy()
 		if self.avatar:
 			self.avatar.release()
-		Application.__instance = None
+		destorySingleton(self)
 
 def main(*args):
 	app = Application()

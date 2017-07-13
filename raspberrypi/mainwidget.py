@@ -19,9 +19,8 @@ class MainWidget(Frame):
 		self.statusBar.pack(side = BOTTOM, fill="x")
 
 	def create_widgets(self):
-		self.canv = Canvas(self, bg = "#220044", cursor = 'fleur', width = self.master.winfo_width(), height = self.master.winfo_height())
-		self.canv.pack(side = TOP, fill = "both",  expand = 1)
-		self.fritz = FritzPaint(self.canv)
+		self.fritz = FritzPaint(self, bg = "white", cursor = 'fleur', width = self.master.winfo_width(), height = self.master.winfo_height())
+		self.fritz.pack(side = TOP, fill = "both",  expand = 1)
 		self.fritz.draw()
 
 	def create_menu(self):

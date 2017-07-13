@@ -96,6 +96,8 @@ class FritzRobot(object):
 			self.serial.write(self.protocol.packCommand(Protocol.ARDUINO_LOAD_CONFIG, [85]))
 			self.serial.flush()
 
+			print "........clear up serial"
+
 			head_byte_count = 3
 			crc = 0
 

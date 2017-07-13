@@ -7,7 +7,7 @@
 #include "SoftwareServos.h"
 #include <EEPROM.h>
 
-SoftwareSerial mySerial(10, 11);
+SoftwareSerial debug(10, 11);
 
 int highestPin = 20;
 
@@ -55,10 +55,10 @@ void initialize()
 void setup()
 {
   Serial.begin(57600);
-  mySerial.begin(9600);
+  debug.begin(9600);
   ss_Init();
 
-  mySerial.println("setup over!");
+  debug.println("setup over!");
 }
 
 int readPacket()
@@ -85,7 +85,7 @@ int readPacket()
   g_message[0] = crc = g_command;
   g_command^=128;
 
-  //mySerial.println(g_command);
+  //debug.println(g_command);
   while (Serial.available() <= 0) continue;
   g_length = g_message[1] = Serial.read();
   crc ^= g_length;
@@ -99,7 +99,7 @@ int readPacket()
     g_messageTop=3;
   }
 
-  //mySerial.println(g_length);
+  //debug.println(g_length);
   // read in entire message
   if (g_length>0)
   {
@@ -306,6 +306,7 @@ void loop()
         g_count = g_message[3]*2;
 
         g_message[0]=g_command|128;
+        debug.print(g_message[0]);
         if (g_count > 128) {
           g_message[1] = (g_count + 1) & 127;
           g_message[2] = ((g_count + 1) >> 7) & 127;  
@@ -314,6 +315,7 @@ void loop()
           g_message[2]=0;
         }
         crc=g_message[0]^g_message[1]^g_message[2];
+        debug.write(crc);
 
 	for (j=3,i=0;i<g_count;i+=2,j+=2)
 	{

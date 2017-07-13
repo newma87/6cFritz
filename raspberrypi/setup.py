@@ -250,7 +250,10 @@ class SetupDialog(Dialog):
 
 	def onSaveConfig(self, component, key, result):
 		if result:
-			self.robot.moveServo(component.getName(), component.getValue(key))
+			if (key == 'trim'):
+				self.robot.moveServo(component.getName(), component.getValue(key) + component.getValue('min'))
+			else:
+				self.robot.moveServo(component.getName(), component.getValue(key))
 
 	def onComponentTest(self, component):
 		pass
